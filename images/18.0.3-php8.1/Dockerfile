@@ -87,6 +87,8 @@ EXPOSE 80
 VOLUME /var/www/documents
 VOLUME /var/www/html/custom
 
+ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
+RUN chmod +x /usr/local/bin/install-php-extensions && install-php-extensions gd xdebug
 COPY docker-init.php /var/www/scripts/
 COPY docker-run.sh /usr/local/bin/
 ENTRYPOINT ["docker-run.sh"]

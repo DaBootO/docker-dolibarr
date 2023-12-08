@@ -38,7 +38,7 @@ services:
 
     cron:
         build:
-            context: ./docker-compose-links/${DOLI_VERSION}${PHP_VERSION}
+            context: ./images/${DOLI_VERSION}-${PHP_VERSION}
         image: tuxgasy/dolibarr:${DOLI_VERSION}${PHP_VERSION}
         secrets:
             - mysql-user
@@ -54,7 +54,7 @@ services:
             DOLI_ADMIN_PASSWORD: admin456
             DOLI_DB_HOST: mariadb
             DOLI_DB_NAME: dolibarr
-            DOLI_URL_ROOT: http://0.0.0.0
+            DOLI_URL_ROOT: http://127.0.0.1
             WWW_USER_ID: 1000
             WWW_GROUP_ID: 1000
         networks:
@@ -62,28 +62,30 @@ services:
 
     web:
         build:
-            context: ./docker-compose-links/${DOLI_VERSION}${PHP_VERSION}
+            context: ./images/${DOLI_VERSION}-${PHP_VERSION}
         image: tuxgasy/dolibarr:${DOLI_VERSION}${PHP_VERSION}
         secrets:
             - mysql-user
             - mysql-password
         volumes:
-            - ./.volumes/dolibarr/custom:/var/www/html/custom
+            - ../dolibarr-18.0.3/htdocs:/var/www/htdocs
         depends_on:
             - mariadb
         environment:
+            XDEBUG_MODE: debug
+            XDEBUG_CONFIG: client_host=host.docker.internal client_port=9003
             DOLI_INSTANCE_UNIQUE_ID: xxxx
             DOLI_DB_USER_FILE: "/run/secrets/mysql-user"
             DOLI_DB_PASSWORD_FILE: "/run/secrets/mysql-password"
-            DOLI_ADMIN_LOGIN: "administrator"
-            DOLI_ADMIN_PASSWORD: "admin456"
+            DOLI_ADMIN_LOGIN: "admin"
+            DOLI_ADMIN_PASSWORD: "admin"
             DOLI_DB_HOST: mariadb
             DOLI_DB_NAME: dolibarr
-            DOLI_URL_ROOT: 'http://0.0.0.0'
+            DOLI_URL_ROOT: 'http://127.0.0.1'
             WWW_USER_ID: 1000
             WWW_GROUP_ID: 1000
         ports:
-            - "80:80"
+            - "8000:80"
         networks:
             - internal-pod
             - external-pod
